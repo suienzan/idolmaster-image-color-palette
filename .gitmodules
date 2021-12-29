@@ -1,0 +1,3 @@
+[submodule "imasparql"]
+	path = imasparql
+	url = https://github.com/imas/imasparql.git
