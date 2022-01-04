@@ -1,5 +1,5 @@
 import * as chroma from 'chroma.ts';
-import untypedColorData from './colorData.json';
+import untypedColorData from '../colorData.json';
 
 export type IColorType = 'rgb' | 'hsl' | 'hex';
 

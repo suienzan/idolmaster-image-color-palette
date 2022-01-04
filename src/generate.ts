@@ -51,5 +51,5 @@ const readFile = (production: string) => fs.promises
 Promise.all(productions.map(readFile))
   .then((array) => array.filter(({ idols }) => Array.isArray(idols) && idols.length > 0))
   .then((json) => {
-    fs.writeFileSync('src/colorData.json', JSON.stringify(json, null, 2));
+    fs.writeFileSync('colorData.json', JSON.stringify(json, null, 2));
   });
