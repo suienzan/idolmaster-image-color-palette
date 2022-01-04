@@ -5,6 +5,7 @@ import { colorData, IColorType, Idol } from './colorData';
 import ReloadPrompt from './ReloadPrompt.vue';
 import InputSwitch from './components/InputSwitch.vue';
 import InputRadio from './components/InputRadio.vue';
+import SimpleLink from './components/SimpleLink.vue';
 
 const isDarkColor = (hex: string) => chroma.color(hex).hsl()[2] < 0.5;
 
@@ -18,7 +19,21 @@ const colorType = ref<IColorType>('hex');
 
 <template>
   <header class="text-lg">
-    Click to copy color. (NOTE! Colors from Cinderella Girls do not have exact official hex value.)
+    <div>
+      Click to copy color. Using color data form
+      <SimpleLink href="https://github.com/imas/imasparql">
+        imasparql
+      </SimpleLink>. Source on
+      <SimpleLink href="https://github.com/suienzan/idolmaster-image-color-palette">
+        Github
+      </SimpleLink>
+    </div>
+    <div class="mt-2">
+      (NOTE! Colors from Cinderella Girls do not have exact official hex value.
+      <SimpleLink href="https://github.com/imas/imasparql/issues/55">
+        #55
+      </SimpleLink>)
+    </div>
   </header>
   <nav class="sticky top-0 bg-white/70 dark:bg-neutral-700/70 backdrop-blur-md w-full p-2">
     <div class="flex items-center">
