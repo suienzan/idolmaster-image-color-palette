@@ -22,11 +22,11 @@ const emit = defineEmits<{(e: 'update:modelValue', modelValue: boolean): void }>
       >
       <div
         class="w-10 h-4 rounded-full shadow-inner"
-        :class="modelValue ? 'bg-[#e38feb]' : 'bg-neutral-400'"
+        :class="modelValue ? 'bg-accent' : 'bg-neutral-400'"
       />
       <div
         class="absolute w-6 h-6 bg-white rounded-full shadow -left-1 -top-1 transition"
-        :class="{ 'bg-[#7e3188] translate-x-full': modelValue }"
+        :class="{ 'bg-primary translate-x-full': modelValue }"
       />
     </div>
     <div class="ml-1 px-1 font-medium">{{ label }}</div>

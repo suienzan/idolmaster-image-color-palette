@@ -33,7 +33,7 @@ const checked = computed(() => modelValue === value);
         class="w-6 h-6 rounded-full border-2 bg-transparent"
         :class="
           checked // eslint-disable-next-line max-len
-            ? 'border-[#7e3188] before:content-[\'\'] before:block before:w-4 before:h-4 before:rounded-full before:absolute before:top-1 before:left-1 before:bg-[#7e3188]'
+            ? 'border-primary before:content-[\'\'] before:block before:w-4 before:h-4 before:rounded-full before:absolute before:top-1 before:left-1 before:bg-primary'
             : 'border-neutral-400'
         "
       />
