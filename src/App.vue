@@ -17,31 +17,31 @@ const colorType = ref<IColorType>('hex');
 </script>
 
 <template>
-  <div class="min-h-screen dark:bg-neutral-700 dark:text-white">
-    <header class="sticky top-0 bg-white/70 dark:bg-neutral-700/70 backdrop-blur-md w-full p-2">
-      <div class="text-lg">
-        Click to copy color
-      </div>
-      <div class="mt-2 flex items-center">
-        <InputSwitch
-          v-model="englishName"
-          label="English names"
-        />
-        <InputRadio
-          v-model="colorType"
-          name="colorType"
-          label="hex"
-          value="hex"
-        />
-        <InputRadio
-          v-model="colorType"
-          name="colorType"
-          label="hsl"
-          value="hsl"
-        />
-      </div>
-    </header>
-    <main
+  <header class="text-lg">
+    Click to copy color. (NOTE! Colors from Cinderella Girls do not have exact official hex value.)
+  </header>
+  <nav class="sticky top-0 bg-white/70 dark:bg-neutral-700/70 backdrop-blur-md w-full p-2">
+    <div class="flex items-center">
+      <InputSwitch
+        v-model="englishName"
+        label="English names"
+      />
+      <InputRadio
+        v-model="colorType"
+        name="colorType"
+        label="hex"
+        value="hex"
+      />
+      <InputRadio
+        v-model="colorType"
+        name="colorType"
+        label="hsl"
+        value="hsl"
+      />
+    </div>
+  </nav>
+  <main>
+    <section
       v-for="production in colorData"
       :key="production.name"
       class="md:px-4"
@@ -50,7 +50,7 @@ const colorType = ref<IColorType>('hex');
         {{ production.name }}
       </h2>
       <!-- prettier-ignore -->
-      <section
+      <div
         class="
           grid grid-cols-[repeat(auto-fill,_50%)]
           md:gap-4 md:grid-cols-[repeat(auto-fill,_192px)]
@@ -69,8 +69,8 @@ const colorType = ref<IColorType>('hex');
           <div>{{ englishName ? idol.en : idol.ja }}</div>
           <div>{{ idol.get(colorType) }}</div>
         </div>
-      </section>
-    </main>
-  </div>
+      </div>
+    </section>
+  </main>
   <ReloadPrompt />
 </template>
