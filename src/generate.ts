@@ -88,7 +88,7 @@ const readFile = (production: string) => fs.promises
     idols: compose(patch, convertToJs)(data),
   }));
 
-const productions = ['1stVision', 'CinderellaGirls', '765MillionStars', '283', '876', '961'];
+const productions = ['1stVision', '765MillionStars', '283', '876', '961', 'CinderellaGirls'];
 
 const filterProduction = filter<Record<'idols', IIdol[]>>(compose(arrayNotEmpty, prop('idols')));
 
