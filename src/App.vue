@@ -1,20 +1,45 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import * as chroma from 'chroma.ts';
-import { colorData, IColorType, Idol } from './colorData';
-import ReloadPrompt from './ReloadPrompt.vue';
-import InputSwitch from './components/InputSwitch.vue';
-import InputRadio from './components/InputRadio.vue';
-import SimpleLink from './components/SimpleLink.vue';
+import { ref, computed } from 'vue';
 
-const isDarkColor = (hex: string) => chroma.color(hex).hsl()[2] < 0.5;
+import { IColorType } from '@/classes/types';
+import colorData from '@/colorData';
+import Group from '@/classes/Group';
 
-const copyToClipboard = (idol: Idol, type: IColorType) => {
-  navigator.clipboard.writeText(idol.get(type));
-};
+import ReloadPrompt from '@/ReloadPrompt.vue';
+import InputSwitch from '@/components/InputSwitch.vue';
+import InputRadio from '@/components/InputRadio.vue';
+import SimpleLink from '@/components/SimpleLink.vue';
+import IdolList from '@/components/IdolList.vue';
+
+import { complement, prop, propEq } from 'ramda';
 
 const englishName = ref(false);
 const colorType = ref<IColorType>('hex');
+const groupByHue = ref(false);
+const grayRange = ref(0.07);
+const showCG = ref(false);
+
+const hueGroups = ['Gray']
+  .concat([...Array(12).keys()].map((x) => `${x * 30} - ${(x + 1) * 30}`))
+  .map(Group.of);
+
+const filter = complement(propEq('name')('CinderellaGirls'));
+
+const productions = computed(() => (showCG.value ? colorData : colorData.filter(filter)));
+
+const sortedGroup = computed(() => {
+  const newGroups = productions.value.flatMap(prop('idols')).reduce((acc, cur) => {
+    const [, s, l] = cur.color.hsl();
+    if (s < 2 * grayRange.value || l < grayRange.value || l > 1 - grayRange.value) {
+      return acc.map((x, i) => (i === 0 ? x.addIdol(cur) : x));
+    }
+
+    const index = Math.floor(cur.color.hsl()[0] / 30) + 1;
+    return acc.map((x, i) => (i === index ? x.addIdol(cur) : x));
+  }, hueGroups);
+
+  return newGroups.map((x: Group) => x.sort());
+});
 </script>
 
 <template>
@@ -36,7 +61,7 @@ const colorType = ref<IColorType>('hex');
     </div>
   </header>
   <nav class="sticky top-0 bg-white/70 dark:bg-neutral-700/70 backdrop-blur-md w-full p-2">
-    <div class="flex items-center">
+    <div class="flex items-center flex-wrap">
       <InputSwitch
         v-model="englishName"
         label="English names"
@@ -53,38 +78,30 @@ const colorType = ref<IColorType>('hex');
         label="hsl"
         value="hsl"
       />
+      <InputSwitch
+        v-model="groupByHue"
+        label="Group by hue"
+      />
+      <InputSwitch
+        v-model="showCG"
+        label="Show Cinderella"
+      />
     </div>
   </nav>
   <main>
     <section
-      v-for="production in colorData"
-      :key="production.name"
+      v-for="group in groupByHue ? sortedGroup : productions"
+      :key="group.name"
       class="md:px-4"
     >
       <h2>
-        {{ production.name }}
+        {{ group.name }}
       </h2>
-      <!-- prettier-ignore -->
-      <div
-        class="
-          grid grid-cols-[repeat(auto-fill,_50%)]
-          md:gap-4 md:grid-cols-[repeat(auto-fill,_192px)]
-          text-sm
-        "
-      >
-        <div
-          v-for="idol in production.idols"
-          :key="idol.ja"
-          :color="idol.get('hex')"
-          :style="{ backgroundColor: idol.get('hex') }"
-          class="h-[100px] flex flex-col items-center justify-center cursor-pointer"
-          :class="isDarkColor(idol.get('hex')) ? 'text-white' : 'text-black'"
-          @click="copyToClipboard(idol, colorType)"
-        >
-          <div>{{ englishName ? idol.en : idol.ja }}</div>
-          <div>{{ idol.get(colorType) }}</div>
-        </div>
-      </div>
+      <IdolList
+        :idols="group.idols"
+        :english-name="englishName"
+        :color-type="colorType"
+      />
     </section>
   </main>
   <ReloadPrompt />

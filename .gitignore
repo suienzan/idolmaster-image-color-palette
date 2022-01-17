@@ -4,4 +4,4 @@ node_modules
 dist
 coverage
 
-colorData.json
+src/colorData.json

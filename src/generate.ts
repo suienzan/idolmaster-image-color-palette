@@ -19,7 +19,7 @@ import {
   uncurryN,
 } from 'ramda';
 import convert, { Element } from 'xml-js';
-import { IIdol } from './colorData';
+import { IIdol } from '@/classes/types';
 
 const nameKeyList = ['schema:name', 'schema:alternateName', 'schema:givenName'];
 
@@ -97,4 +97,4 @@ const writeFileSync = curry((file: fs.PathLike, data: string) => fs.writeFileSyn
 
 Promise.all(productions.map(readFile))
   .then(filterProduction)
-  .then(compose(writeFileSync('colorData.json'), JSON.stringify));
+  .then(compose(writeFileSync('src/colorData.json'), JSON.stringify));

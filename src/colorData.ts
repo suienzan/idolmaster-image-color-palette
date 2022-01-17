@@ -1,55 +1,7 @@
-import * as chroma from 'chroma.ts';
-import untypedColorData from '../colorData.json';
+import untypedColorData from '@/colorData.json';
+import Idol from './classes/Idol';
 
-export type IColorType = 'rgb' | 'hsl' | 'hex';
-
-export interface IIdol {
-  ja: string;
-  en?: string;
-  hex: string;
-}
-
-export class Idol {
-  constructor(idol: IIdol) {
-    this.ja = idol.ja;
-    this.en = idol.en;
-    this.hex = idol.hex;
-    this.color = chroma.color(idol.hex);
-  }
-
-  ja: string;
-
-  en?: string;
-
-  private hex: string;
-
-  color: chroma.Color;
-
-  get(type: IColorType) {
-    return type === 'hex' ? this.hex : this.color.css(type);
-  }
-
-  static colorEqual(a: Idol, b: Idol) {
-    return a.get('hex') === b.get('hex');
-  }
-
-  static merge(a: Idol, b: Idol) {
-    if (!this.colorEqual(a, b)) return a;
-
-    return new Idol({
-      ja: `${a.ja} & ${b.ja}`,
-      en: `${a.en} & ${b.en}`,
-      hex: a.hex,
-    });
-  }
-}
-
-export interface IProduction {
-  name: string;
-  idols: Idol[];
-}
-
-export const colorData = untypedColorData.map((production) => ({
+export default untypedColorData.map((production) => ({
   name: production.name,
   idols: production.idols
     .map((idol) => new Idol(idol))

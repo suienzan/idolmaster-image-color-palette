@@ -38,6 +38,6 @@ const checked = computed(() => modelValue === value);
         "
       />
     </div>
-    <div class="font-medium px-1">{{ label }}</div>
+    <div class="font-medium mx-1">{{ label }}</div>
   </label>
 </template>

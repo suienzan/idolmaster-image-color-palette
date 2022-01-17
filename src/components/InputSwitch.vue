@@ -13,7 +13,7 @@ const emit = defineEmits<{(e: 'update:modelValue', modelValue: boolean): void }>
 
 <template>
   <label class="flex items-center cursor-pointer">
-    <div class="relative">
+    <div class="relative ml-1 my-1">
       <input
         :checked="modelValue"
         type="checkbox"
@@ -29,6 +29,6 @@ const emit = defineEmits<{(e: 'update:modelValue', modelValue: boolean): void }>
         :class="{ 'bg-primary translate-x-full': modelValue }"
       />
     </div>
-    <div class="ml-1 px-1 font-medium">{{ label }}</div>
+    <div class="font-medium mx-1">{{ label }}</div>
   </label>
 </template>
