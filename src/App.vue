@@ -60,7 +60,7 @@ const sortedGroup = computed(() => {
       </SimpleLink>)
     </div>
   </header>
-  <nav class="sticky top-0 bg-white/70 dark:bg-neutral-700/70 backdrop-blur-md w-full p-2">
+  <nav class="sticky top-0 bg-light/70 dark:bg-dark/70 backdrop-blur-md w-full p-2">
     <div class="flex items-center flex-wrap">
       <InputSwitch
         v-model="englishName"
