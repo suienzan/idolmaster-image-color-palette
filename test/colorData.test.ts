@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { Idol } from '../src/colorData';
+import Idol from '@/classes/Idol';
 
 test('color', () => {
   const sakuya = new Idol({

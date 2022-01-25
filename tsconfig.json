@@ -19,5 +19,5 @@
     "types": ["node"],
     "skipLibCheck": true
   },
-  "include": ["vite.config.*", "src/**/*", "src/**/*.vue"]
+  "include": ["vite.config.*", "src/**/*", "src/**/*.vue", "test/**/*.ts"]
 }
