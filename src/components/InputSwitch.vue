@@ -12,8 +12,8 @@ const emit = defineEmits<{(e: 'update:modelValue', modelValue: boolean): void }>
 </script>
 
 <template>
-  <label class="flex items-center cursor-pointer">
-    <div class="relative ml-1 my-1">
+  <label class="flex cursor-pointer items-center">
+    <div class="relative my-1 ml-1">
       <input
         :checked="modelValue"
         type="checkbox"
@@ -21,14 +21,14 @@ const emit = defineEmits<{(e: 'update:modelValue', modelValue: boolean): void }>
         @input="$emit('update:modelValue', ($event.target as HTMLInputElement).checked)"
       >
       <div
-        class="w-10 h-4 rounded-full shadow-inner"
+        class="h-4 w-10 rounded-full shadow-inner"
         :class="modelValue ? 'bg-accent' : 'bg-neutral-400'"
       />
       <div
-        class="absolute w-6 h-6 bg-white rounded-full shadow -left-1 -top-1 transition"
-        :class="{ 'bg-primary translate-x-full': modelValue }"
+        class="absolute -left-1 -top-1 h-6 w-6 rounded-full bg-white shadow transition"
+        :class="{ 'translate-x-full bg-primary': modelValue }"
       />
     </div>
-    <div class="font-medium mx-1">{{ label }}</div>
+    <div class="mx-1 font-medium">{{ label }}</div>
   </label>
 </template>

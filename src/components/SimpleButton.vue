@@ -1,7 +1,7 @@
 <script setup lang="ts" name="SimpleButton"></script>
 
 <template>
-  <button class="bg-primary text-white rounded-md shadow-neutral-800 shadow-sm px-3 py-1">
+  <button class="rounded-md bg-primary px-3 py-1 text-white shadow-sm shadow-neutral-800">
     <slot />
   </button>
 </template>

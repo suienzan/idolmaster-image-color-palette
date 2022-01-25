@@ -20,7 +20,7 @@ const checked = computed(() => modelValue === value);
 </script>
 
 <template>
-  <label class="flex items-center cursor-pointer">
+  <label class="flex cursor-pointer items-center">
     <div class="relative">
       <input
         :checked="checked"
@@ -30,14 +30,14 @@ const checked = computed(() => modelValue === value);
         @input="$emit('update:modelValue', value)"
       >
       <div
-        class="w-6 h-6 rounded-full border-2 bg-transparent"
+        class="h-6 w-6 rounded-full border-2 bg-transparent"
         :class="
           checked // eslint-disable-next-line max-len
-            ? 'border-primary before:content-[\'\'] before:block before:w-4 before:h-4 before:rounded-full before:absolute before:top-1 before:left-1 before:bg-primary'
+            ? 'border-primary before:absolute before:top-1 before:left-1 before:block before:h-4 before:w-4 before:rounded-full before:bg-primary before:content-[\'\']'
             : 'border-neutral-400'
         "
       />
     </div>
-    <div class="font-medium mx-1">{{ label }}</div>
+    <div class="mx-1 font-medium">{{ label }}</div>
   </label>
 </template>
