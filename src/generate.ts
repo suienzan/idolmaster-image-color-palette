@@ -43,6 +43,8 @@ const getName: (e: Element) => string | undefined = path<string>(['elements', 0,
 
 const getByLang = curry(compose(getName, findElementByLang));
 
+// https://github.com/nashwaan/xml-js/issues/125
+// https://github.com/microsoft/TypeScript/issues/33014
 const convertToJs = (data: Buffer) => convert.xml2js(data.toString(), {
   ignoreDeclaration: true,
   ignoreInstruction: true,
