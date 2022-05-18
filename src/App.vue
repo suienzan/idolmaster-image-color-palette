@@ -5,7 +5,6 @@ import { IColorType } from '@/classes/types';
 import colorData from '@/colorData';
 import Group from '@/classes/Group';
 
-import ReloadPrompt from '@/ReloadPrompt.vue';
 import InputSwitch from '@/components/InputSwitch.vue';
 import InputRadio from '@/components/InputRadio.vue';
 import SimpleLink from '@/components/SimpleLink.vue';
@@ -104,5 +103,4 @@ const sortedGroup = computed(() => {
       />
     </section>
   </main>
-  <ReloadPrompt />
 </template>

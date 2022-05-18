@@ -9,7 +9,9 @@ export default defineConfig({
     vue({
       reactivityTransform: true,
     }),
-    VitePWA(),
+    VitePWA({
+      registerType: 'autoUpdate',
+    }),
   ],
   resolve: {
     alias: {
