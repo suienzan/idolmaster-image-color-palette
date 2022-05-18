@@ -1,30 +1,35 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import {
+  both, compose, length, lt, prop,
+} from 'ramda';
 
 import { IColorType } from '@/classes/types';
 import colorData from '@/colorData';
-import Group from '@/classes/Group';
+import Group, { type IGroup } from '@/classes/Group';
 
 import InputSwitch from '@/components/InputSwitch.vue';
 import InputRadio from '@/components/InputRadio.vue';
 import SimpleLink from '@/components/SimpleLink.vue';
 import IdolList from '@/components/IdolList.vue';
 
-import { complement, prop, propEq } from 'ramda';
+const arrayNotEmpty = both(Array.isArray, compose(lt(0), length));
 
 const englishName = ref(false);
 const colorType = ref<IColorType>('hex');
 const groupByHue = ref(false);
 const grayRange = ref(0.07);
-const showCG = ref(false);
+const showUnofficial = ref(false);
 
 const hueGroups = ['Gray']
   .concat([...Array(12).keys()].map((x) => `${x * 30} - ${(x + 1) * 30}`))
   .map(Group.of);
 
-const filter = complement(propEq('name')('CinderellaGirls'));
+const filterOfficialIdol = (x: IGroup) => ({ ...x, idols: x.idols.filter((y) => y.isOffical) });
+const omitEmptyGroup = (x: IGroup) => arrayNotEmpty(x.idols);
+const filterOfficial = (arr: IGroup[]) => arr.map(filterOfficialIdol).filter(omitEmptyGroup);
 
-const productions = computed(() => (showCG.value ? colorData : colorData.filter(filter)));
+const productions = computed(() => (showUnofficial.value ? colorData : filterOfficial(colorData)));
 
 const sortedGroup = computed(() => {
   const newGroups = productions.value.flatMap(prop('idols')).reduce((acc, cur) => {
@@ -53,7 +58,7 @@ const sortedGroup = computed(() => {
       </SimpleLink>
     </div>
     <div class="mt-2">
-      (NOTE! Colors from Cinderella Girls do not have exact official hex value.
+      (NOTE! Some colors from Cinderella Girls do not have exact official hex value.
       <SimpleLink href="https://github.com/imas/imasparql/issues/55">
         #55
       </SimpleLink>)
@@ -82,8 +87,8 @@ const sortedGroup = computed(() => {
         label="Group by hue"
       />
       <InputSwitch
-        v-model="showCG"
-        label="Show Cinderella"
+        v-model="showUnofficial"
+        label="Show unofficial color"
       />
     </div>
   </nav>

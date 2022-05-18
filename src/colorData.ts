@@ -1,7 +1,11 @@
 import untypedColorData from '@/colorData.json';
+import { IProduction } from './classes/types';
+import { IGroup } from './classes/Group';
 import Idol from './classes/Idol';
 
-export default untypedColorData.map((production) => ({
+const colorData = untypedColorData as IProduction[];
+
+const group: IGroup[] = colorData.map((production) => ({
   name: production.name,
   idols: production.idols
     .map((idol) => new Idol(idol))
@@ -12,3 +16,5 @@ export default untypedColorData.map((production) => ({
       return Object.assign([], aac, { [sameColorIndex]: Idol.merge(aac[sameColorIndex], idol) });
     }, []),
 }));
+
+export default group;

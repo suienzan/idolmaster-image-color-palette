@@ -1,11 +1,14 @@
 import Idol from './Idol';
 
-interface IGroup {
+interface IEmptyGroup {
   name: string;
   idols?: Idol[];
 }
+
+export type IGroup = Required<IEmptyGroup>;
+
 export default class Group {
-  constructor({ name, idols }: IGroup) {
+  constructor({ name, idols }: IEmptyGroup) {
     this.name = name;
     this.idols = idols || [];
   }

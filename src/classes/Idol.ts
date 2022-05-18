@@ -8,15 +8,18 @@ export default class Idol {
     this.en = idol.en;
     this.hex = idol.hex;
     this.color = chroma.color(idol.hex);
+    this.isOffical = idol.isOffical;
   }
 
   ja: string;
 
   en?: string;
 
-  private hex: string;
+  private hex: `#${string}`;
 
   color: chroma.Color;
+
+  isOffical?: boolean;
 
   get(type: IColorType) {
     return type === 'hex' ? this.hex : this.color.css(type);
@@ -30,6 +33,7 @@ export default class Idol {
     if (!this.colorEqual(a, b)) return a;
 
     return new Idol({
+      ...a,
       ja: `${a.ja} & ${b.ja}`,
       en: `${a.en} & ${b.en}`,
       hex: a.hex,

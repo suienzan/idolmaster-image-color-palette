@@ -1,50 +1,26 @@
-/* eslint no-unused-vars: ["error", { "argsIgnorePattern": "[e es l]" }] */
+/* eslint no-unused-vars: ["error", { "argsIgnorePattern": "[e]" }] */
 import fs from 'fs';
 import {
   both,
   compose,
   curry,
   defaultTo,
-  equals,
   filter,
-  find,
   flip,
+  includes,
   length,
   lt,
-  map,
+  partition,
   path,
+  pathOr,
   prop,
-  propEq,
-  reduce,
-  uncurryN,
+  propOr,
 } from 'ramda';
 import convert, { Element } from 'xml-js';
-import { IIdol } from '@/classes/types';
-
-const nameKeyList = ['schema:name', 'schema:alternateName', 'schema:givenName'];
-
-const getNameElements = (es: Element[]) =>
-  // eslint-disable-next-line implicit-arrow-linebreak
-  map((k) => filter(propEq<string>('name', k), es), nameKeyList);
+import { IIdol, IProduction } from '@/classes/types';
 
 const arrayNotEmpty = both(Array.isArray, compose(lt(0), length));
 
-const getFirstNotEmpty = find<Element[]>(arrayNotEmpty);
-
-const getPreferedName = compose(defaultTo<Element[]>([]), getFirstNotEmpty, getNameElements);
-
-const getLang = path<string>(['attributes', 'xml:lang']);
-
-const unflipped = (l: string) => find(compose(equals<string | undefined>(l), getLang));
-const uncurried: (l: string, es: Element[]) => Element = uncurryN(2, unflipped);
-const findElementByLang = flip(uncurried);
-
-const getName: (e: Element) => string | undefined = path<string>(['elements', 0, 'text']);
-
-const getByLang = curry(compose(getName, findElementByLang));
-
-// https://github.com/nashwaan/xml-js/issues/125
-// https://github.com/microsoft/TypeScript/issues/33014
 const convertToJs = (data: Buffer) => convert.xml2js(data.toString(), {
   ignoreDeclaration: true,
   ignoreInstruction: true,
@@ -54,43 +30,70 @@ const convertToJs = (data: Buffer) => convert.xml2js(data.toString(), {
   trim: true,
 }) as Element;
 
-const reducer = (aac: IIdol[], { elements }: Element) => {
-  if (!elements) return aac;
+const getIdolElementList: (e: Element) => Element[] = compose(
+  defaultTo<Element[]>([]),
+  path<Element[]>(['elements', 0, 'elements']),
+);
 
-  const names = getPreferedName(elements);
+const attrs = ['schema:name', 'schema:alternateName', 'schema:givenName', 'imas:Color'] as const;
 
-  const getNameByLang = getByLang(names);
+type EntryKeys = typeof attrs[number];
 
-  const ja = getNameByLang('ja');
-  const en = getNameByLang('en');
-  const colorElement = elements.find(propEq<string>('name', 'imas:Color'));
-  const color = path<string>(['elements', 0, 'text'], colorElement);
+type Entry<T = EntryKeys> = [T, T extends 'imas:Color' ? string : Record<string, string>];
 
-  if (!ja || !color) return aac;
+interface ElementHasName extends Element {
+  name: EntryKeys;
+}
+
+const hasName = (e: ElementHasName | Element): e is ElementHasName => !!e.name;
+
+const patch = (production: string) => (elements: Element[]) => elements.reduce((acc, e) => {
+  const description: Element[] = propOr([], 'elements')(e);
+  const picked = filter(compose(flip(includes)(attrs), propOr('', 'name')))(description);
+
+  const entries: Entry[] = picked.filter(hasName).map((x) => {
+    const lang = path<string>(['attributes', 'xml:lang'], x);
+
+    const entry: Entry = lang
+      ? [x.name, { [lang]: pathOr<string>('', ['elements', 0, 'text'], x) }]
+      : [x.name, pathOr<string>('', ['elements', 0, 'text'], x)];
+
+    return entry;
+  });
+
+  const [allNames, subInfo] = partition((x: Entry) => x[0].startsWith('schema:'))(entries);
+
+  const namestring = attrs.find((x) => allNames.some((y) => y[0] === x));
+
+  const names = allNames.filter((x) => x[0] === namestring);
+
+  const nameEntries = names.map((x) => x[1]).flatMap(Object.entries);
+
+  const { ja = '', en, 'imas:Color': color } = Object.fromEntries(nameEntries.concat(subInfo));
+
+  const checkOfficial = (x: string, y: string) => x !== 'CinderellaGirls'
+      || ['双葉杏', '安部菜々', '高垣楓', '神崎蘭子', '城ヶ崎美嘉', '諸星きらり'].includes(y);
+
+  if (!color) return acc;
 
   const idol: IIdol = {
     ja,
     en,
     hex: `#${color}`,
+    isOffical: checkOfficial(production, ja),
   };
 
-  return aac.concat(idol);
-};
+  return acc.concat(idol);
+}, [] as IIdol[]);
 
-const patch: (e: Element) => IIdol[] = compose(
-  reduce(reducer, []),
-  defaultTo<Element[]>([]),
-  path<Element[]>(['elements', 0, 'elements']),
-);
-
-const readFile = (production: string) => fs.promises
+const readFile = (production: string): Promise<IProduction> => fs.promises
   .readFile(new URL(`../imasparql/RDFs/${production}.rdf`, import.meta.url).pathname)
   .then((data) => ({
     name: production,
-    idols: compose(patch, convertToJs)(data),
+    idols: compose(patch(production), getIdolElementList, convertToJs)(data),
   }));
 
-const productions = ['1stVision', '765MillionStars', '283', '876', '961', 'CinderellaGirls'];
+const productions = ['1stVision', '765MillionStars', 'CinderellaGirls', '283', '876', '961'];
 
 const filterProduction = filter<Record<'idols', IIdol[]>>(compose(arrayNotEmpty, prop('idols')));
 
