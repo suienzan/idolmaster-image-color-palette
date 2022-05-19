@@ -21,6 +21,8 @@ import { IIdol, IProduction } from '@/classes/types';
 
 const arrayNotEmpty = both(Array.isArray, compose(lt(0), length));
 
+// https://github.com/nashwaan/xml-js/issues/125
+// https://github.com/microsoft/TypeScript/issues/33014
 const convertToJs = (data: Buffer) => convert.xml2js(data.toString(), {
   ignoreDeclaration: true,
   ignoreInstruction: true,
