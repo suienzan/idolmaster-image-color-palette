@@ -82,6 +82,12 @@ const sortedGroup = computed(() => {
         label="hsl"
         value="hsl"
       />
+      <InputRadio
+        v-model="colorType"
+        name="colorType"
+        label="rgb"
+        value="rgb"
+      />
       <InputSwitch
         v-model="groupByHue"
         label="Group by hue"
