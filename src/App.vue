@@ -17,6 +17,7 @@ const arrayNotEmpty = both(Array.isArray, compose(lt(0), length));
 
 const englishName = ref(false);
 const colorType = ref<IColorType>('hex');
+const noPrefix = ref(false);
 const groupByHue = ref(false);
 const grayRange = ref(0.07);
 const showUnofficial = ref(false);
@@ -89,6 +90,10 @@ const sortedGroup = computed(() => {
         value="rgb"
       />
       <InputSwitch
+        v-model="noPrefix"
+        label="Remove prefix"
+      />
+      <InputSwitch
         v-model="groupByHue"
         label="Group by hue"
       />
@@ -111,6 +116,7 @@ const sortedGroup = computed(() => {
         :idols="group.idols"
         :english-name="englishName"
         :color-type="colorType"
+        :no-prefix="noPrefix"
       />
     </section>
   </main>

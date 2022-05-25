@@ -2,20 +2,32 @@
 import * as chroma from 'chroma.ts';
 import Idol from '@/classes/Idol';
 import { IColorType } from '@/classes/types';
+import { removePrefix } from '@/utils';
 
 interface Props {
   idols: Idol[];
   englishName: boolean;
   colorType: IColorType;
+  noPrefix: boolean;
 }
 
 // eslint-disable-next-line vue/no-setup-props-destructure
-const { idols = [], englishName = false, colorType = 'hex' } = defineProps<Props>();
+const {
+  idols = [],
+  englishName = false,
+  colorType = 'hex',
+  noPrefix = false,
+} = defineProps<Props>();
 
 const isDarkColor = (hex: string) => chroma.color(hex).hsl()[2] < 0.5;
 
-const copyToClipboard = (idol: Idol, type: IColorType) => {
-  navigator.clipboard.writeText(idol.get(type));
+const getColor = (idol: Idol) => {
+  const color = idol.get(colorType);
+  return noPrefix ? removePrefix(color) : color;
+};
+
+const copyToClipboard = (idol: Idol) => {
+  navigator.clipboard.writeText(getColor(idol));
 };
 </script>
 
@@ -35,10 +47,10 @@ const copyToClipboard = (idol: Idol, type: IColorType) => {
       :style="{ backgroundColor: idol.get('hex') }"
       class="h-[100px] flex flex-col items-center justify-center cursor-pointer"
       :class="isDarkColor(idol.get('hex')) ? 'text-white' : 'text-black'"
-      @click="copyToClipboard(idol, colorType)"
+      @click="copyToClipboard(idol)"
     >
       <div>{{ englishName ? idol.en : idol.ja }}</div>
-      <div>{{ idol.get(colorType) }}</div>
+      <div>{{ getColor(idol) }}</div>
     </div>
   </div>
 </template>
