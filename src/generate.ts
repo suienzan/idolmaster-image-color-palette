@@ -74,7 +74,17 @@ const patch = (production: string) => (elements: Element[]) => elements.reduce((
   const { ja = '', en, 'imas:Color': color } = Object.fromEntries(nameEntries.concat(subInfo));
 
   const checkOfficial = (x: string, y: string) => x !== 'CinderellaGirls'
-      || ['双葉杏', '安部菜々', '高垣楓', '神崎蘭子', '城ヶ崎美嘉', '諸星きらり'].includes(y);
+      || [
+        'ナターリア',
+        '双葉杏',
+        '城ヶ崎美嘉',
+        '安部菜々',
+        '桐生つかさ',
+        '的場梨沙',
+        '神崎蘭子',
+        '諸星きらり',
+        '高垣楓',
+      ].includes(y);
 
   if (!color) return acc;
 
