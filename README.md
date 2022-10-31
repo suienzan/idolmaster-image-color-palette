@@ -16,7 +16,7 @@ pnpm run generate
 
 ## Development
 
-Start the development server on [http://localhost:3000](http://localhost:3000)
+Start the development server on [http://localhost:5174/](http://localhost:5174/)
 
 ```bash
 pnpm run dev
