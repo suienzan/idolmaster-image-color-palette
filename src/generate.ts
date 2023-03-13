@@ -1,25 +1,61 @@
-/* eslint no-unused-vars: ["error", { "argsIgnorePattern": "[e]" }] */
-import fs from 'fs';
-import {
-  both,
-  compose,
-  curry,
-  defaultTo,
-  filter,
-  flip,
-  includes,
-  length,
-  lt,
-  partition,
-  path,
-  pathOr,
-  prop,
-  propOr,
-} from 'ramda';
-import convert, { Element } from 'xml-js';
-import { IIdol, IProduction } from '@/classes/types';
+import '@total-typescript/ts-reset';
 
-const arrayNotEmpty = both(Array.isArray, compose(lt(0), length));
+import convert, { Element } from 'xml-js';
+import { path, propEq, pathEq } from 'ramda';
+import fs from 'node:fs';
+import { IIdol } from './classes/types';
+
+const flatElement = (element: Element): Element | Element[] => {
+  const { name, elements } = element;
+
+  return elements && name && ['rdf:RDF'].includes(name) ? elements.flatMap(flatElement) : element;
+};
+
+const purgeUselessAttributes = (element: Element) => (element.elements || []).filter(
+  (x) => x.name?.toLowerCase().includes('name') || x.name?.toLowerCase().includes('color'),
+);
+
+const getElementText = path<string>(['elements', 0, 'text']);
+
+const getName = (lang: 'ja' | 'en') => (elements: Element[]) => {
+  const nameAttributes = ['schema:name', 'schema:alternateName', 'schema:givenName'];
+
+  const localeElement = elements.filter(pathEq(['attributes', 'xml:lang'], lang));
+
+  return nameAttributes
+    .map((x) => localeElement.find(propEq('name' as string, x)))
+    .map(getElementText)
+    .find(Boolean);
+};
+
+const patch = (elements: Element[]) => {
+  const colorElement = elements.find(propEq('name' as string, 'imas:Color'));
+  const color = getElementText(colorElement);
+  const ja = getName('ja')(elements);
+
+  if (!color || !ja) return undefined;
+
+  return { ja, en: getName('en')(elements), hex: `#${color}` satisfies `#${string}` };
+};
+
+const cinderellaGirlsOfficiallList = new Set([
+  'ナターリア',
+  '双葉杏',
+  '城ヶ崎美嘉',
+  '安部菜々',
+  '桐生つかさ',
+  '的場梨沙',
+  '神崎蘭子',
+  '諸星きらり',
+  '高垣楓',
+]);
+
+const checkOfficial = (production: string, idolName: string) => production !== 'CinderellaGirls' || cinderellaGirlsOfficiallList.has(idolName);
+
+const patchOfficial = (production: string) => (idol: IIdol) => ({
+  ...idol,
+  isOffical: checkOfficial(production, idol.ja),
+});
 
 // https://github.com/nashwaan/xml-js/issues/125
 // https://github.com/microsoft/TypeScript/issues/33014
@@ -32,86 +68,25 @@ const convertToJs = (data: Buffer) => convert.xml2js(data.toString(), {
   trim: true,
 }) as Element;
 
-const getIdolElementList: (e: Element) => Element[] = compose(
-  defaultTo<Element[]>([]),
-  path<Element[]>(['elements', 0, 'elements']),
-);
-
-const attrs = ['schema:name', 'schema:alternateName', 'schema:givenName', 'imas:Color'] as const;
-
-type EntryKeys = typeof attrs[number];
-
-type Entry<T = EntryKeys> = [T, T extends 'imas:Color' ? string : Record<string, string>];
-
-interface ElementHasName extends Element {
-  name: EntryKeys;
-}
-
-const hasName = (e: ElementHasName | Element): e is ElementHasName => !!e.name;
-
-const patch = (production: string) => (elements: Element[]) => elements.reduce((acc, e) => {
-  const description: Element[] = propOr([], 'elements')(e);
-  const picked = filter(compose(flip(includes)(attrs), propOr('', 'name')))(description);
-
-  const entries: Entry[] = picked.filter(hasName).map((x) => {
-    const lang = path<string>(['attributes', 'xml:lang'], x);
-
-    const entry: Entry = lang
-      ? [x.name, { [lang]: pathOr<string>('', ['elements', 0, 'text'], x) }]
-      : [x.name, pathOr<string>('', ['elements', 0, 'text'], x)];
-
-    return entry;
-  });
-
-  const [allNames, subInfo] = partition((x: Entry) => x[0].startsWith('schema:'))(entries);
-
-  const namestring = attrs.find((x) => allNames.some((y) => y[0] === x));
-
-  const names = allNames.filter((x) => x[0] === namestring);
-
-  const nameEntries = names.map((x) => x[1]).flatMap(Object.entries);
-
-  const { ja = '', en, 'imas:Color': color } = Object.fromEntries(nameEntries.concat(subInfo));
-
-  const checkOfficial = (x: string, y: string) => x !== 'CinderellaGirls'
-      || [
-        'ナターリア',
-        '双葉杏',
-        '城ヶ崎美嘉',
-        '安部菜々',
-        '桐生つかさ',
-        '的場梨沙',
-        '神崎蘭子',
-        '諸星きらり',
-        '高垣楓',
-      ].includes(y);
-
-  if (!color) return acc;
-
-  const idol: IIdol = {
-    ja,
-    en,
-    hex: `#${color}`,
-    isOffical: checkOfficial(production, ja),
-  };
-
-  return acc.concat(idol);
-}, [] as IIdol[]);
-
-const readFile = (production: string): Promise<IProduction> => fs.promises
+const readFile = (production: string): Promise<{ name: string; idols: Element }> => fs.promises
   .readFile(new URL(`../imasparql/RDFs/${production}.rdf`, import.meta.url).pathname)
   .then((data) => ({
     name: production,
-    idols: compose(patch(production), getIdolElementList, convertToJs)(data),
+    idols: convertToJs(data),
   }));
 
 const productions = ['1stVision', '765MillionStars', 'CinderellaGirls', '283', '876', '961'];
 
-const filterProduction = filter<Record<'idols', IIdol[]>>(compose(arrayNotEmpty, prop('idols')));
+const data = await Promise.all(productions.map(readFile));
 
-// remove optional argument `options?` and do curry
-const writeFileSync = curry((file: fs.PathLike, data: string) => fs.writeFileSync(file, data));
+const patchedData = data.map(({ name, idols }) => ({
+  name,
+  idols: (idols.elements || [])
+    .flatMap(flatElement)
+    .map(purgeUselessAttributes)
+    .map(patch)
+    .filter(Boolean)
+    .map(patchOfficial(name)),
+}));
 
-Promise.all(productions.map(readFile))
-  .then(filterProduction)
-  .then(compose(writeFileSync('src/colorData.json'), JSON.stringify));
+fs.writeFileSync('src/colorData.json', JSON.stringify(patchedData));

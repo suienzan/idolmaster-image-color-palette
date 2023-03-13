@@ -1,22 +1,24 @@
 <script setup lang="ts" name="InputRadio">
-import { computed } from 'vue';
+import { computed, toRefs } from 'vue';
 
-interface Props {
+interface Properties {
   modelValue: string;
   value: string;
   name: string;
   label?: string;
 }
 
-// eslint-disable-next-line vue/no-setup-props-destructure
-const {
-  modelValue, value, name, label = '',
-} = defineProps<Props>();
-// @ts-expect-error ts(6133)
-// eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars, no-shadow
-const emit = defineEmits<{(e: 'update:modelValue', modelValue: string): void }>();
+const properties = withDefaults(defineProps<Properties>(), {
+  label: '',
+});
 
-const checked = computed(() => modelValue === value);
+const {
+  modelValue, value, name, label,
+} = toRefs(properties);
+
+const emit = defineEmits<{(event: 'update:modelValue', payload: string): void }>();
+
+const checked = computed(() => modelValue.value === value.value);
 </script>
 
 <template>
@@ -27,7 +29,7 @@ const checked = computed(() => modelValue === value);
         type="radio"
         :name="name"
         class="sr-only"
-        @input="$emit('update:modelValue', value)"
+        @input="emit('update:modelValue', value)"
       >
       <div
         class="h-6 w-6 rounded-full border-2 bg-transparent"

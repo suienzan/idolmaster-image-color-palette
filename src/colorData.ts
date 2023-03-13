@@ -9,12 +9,12 @@ const group: IGroup[] = colorData.map((production) => ({
   name: production.name,
   idols: production.idols
     .map((idol) => new Idol(idol))
-    // Merge idols with same color. (Saying Ami Futami and Mami Futami)
-    .reduce((aac: Idol[], idol, index) => {
-      const sameColorIndex = aac.findIndex((x) => Idol.colorEqual(x, idol));
-      if (sameColorIndex === -1 && sameColorIndex < index) return aac.concat([idol]);
-      return Object.assign([], aac, { [sameColorIndex]: Idol.merge(aac[sameColorIndex], idol) });
-    }, []),
+    .map((idol, _, array) => {
+      const sameColor = array.filter((x) => Idol.colorEqual(x, idol));
+
+      return sameColor.length === 1 ? idol : Idol.merge(sameColor);
+    })
+    .filter((idol, index, array) => array.findIndex((x) => Idol.colorEqual(x, idol)) === index),
 }));
 
 export default group;

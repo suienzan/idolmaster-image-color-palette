@@ -1,5 +1,6 @@
 import * as chroma from 'chroma.ts';
 
+import { prop } from 'ramda';
 import { IIdol, IColorType } from './types';
 
 export default class Idol {
@@ -29,14 +30,12 @@ export default class Idol {
     return a.get('hex') === b.get('hex');
   }
 
-  static merge(a: Idol, b: Idol) {
-    if (!this.colorEqual(a, b)) return a;
-
+  static merge(idols: Idol[]) {
     return new Idol({
-      ...a,
-      ja: `${a.ja} & ${b.ja}`,
-      en: `${a.en} & ${b.en}`,
-      hex: a.hex,
+      ...idols[0],
+      ja: idols.map(prop('ja')).join(' & '),
+      en: idols.map(prop('en')).join(' & '),
+      hex: idols[0].hex,
     });
   }
 }

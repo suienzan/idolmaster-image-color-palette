@@ -31,5 +31,5 @@ test('merge', () => {
     hex: '#FFE43F',
   });
 
-  expect(Idol.merge(ami, mami)).toEqual(merged);
+  expect(Idol.merge([ami, mami])).toEqual(merged);
 });

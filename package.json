@@ -19,6 +19,7 @@
     "xml-js": "^1.6.11"
   },
   "devDependencies": {
+    "@total-typescript/ts-reset": "^0.4.2",
     "@types/node": "^18.15.1",
     "@types/ramda": "0.28.23",
     "@typescript-eslint/eslint-plugin": "^5.54.1",
@@ -29,6 +30,7 @@
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-import-resolver-typescript": "^3.5.3",
     "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-unicorn": "^46.0.0",
     "eslint-plugin-vue": "^9.9.0",
     "postcss": "^8.4.21",
     "prettier": "^2.8.4",

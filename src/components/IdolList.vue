@@ -3,27 +3,34 @@ import * as chroma from 'chroma.ts';
 import Idol from '@/classes/Idol';
 import { IColorType } from '@/classes/types';
 import { removePrefix } from '@/utils';
+import { toRefs } from 'vue';
 
-interface Props {
+interface Properties {
   idols: Idol[];
   englishName: boolean;
   colorType: IColorType;
   noPrefix: boolean;
 }
 
-// eslint-disable-next-line vue/no-setup-props-destructure
+const properties = withDefaults(defineProps<Properties>(), {
+  idols: () => [],
+  englishName: false,
+  colorType: 'hex',
+  noPrefix: false,
+});
+
 const {
-  idols = [],
-  englishName = false,
-  colorType = 'hex',
-  noPrefix = false,
-} = defineProps<Props>();
+  idols,
+  englishName,
+  colorType,
+  noPrefix,
+} = toRefs(properties);
 
 const isDarkColor = (hex: string) => chroma.color(hex).hsl()[2] < 0.5;
 
 const getColor = (idol: Idol) => {
-  const color = idol.get(colorType);
-  return noPrefix ? removePrefix(color) : color;
+  const color = idol.get(colorType.value);
+  return noPrefix.value ? removePrefix(color) : color;
 };
 
 const copyToClipboard = (idol: Idol) => {

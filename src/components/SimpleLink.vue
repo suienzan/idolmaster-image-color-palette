@@ -1,10 +1,15 @@
 <script setup lang="ts" name="SimpleLink">
-interface Props {
+import { toRefs } from 'vue';
+
+interface Properties {
   href: string;
 }
 
-// eslint-disable-next-line vue/no-setup-props-destructure
-const { href } = defineProps<Props>();
+const properties = defineProps<Properties>();
+
+const {
+  href,
+} = toRefs(properties);
 </script>
 
 <template>

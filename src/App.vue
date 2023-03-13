@@ -22,29 +22,40 @@ const groupByHue = ref(false);
 const grayRange = ref(0.07);
 const showUnofficial = ref(false);
 
-const hueGroups = ['Gray']
-  .concat([...Array(12).keys()].map((x) => `${x * 30} - ${(x + 1) * 30}`))
-  .map(Group.of);
+const groupRange = ref(30);
+
+const getGroupName = (n: number) => (index: number) => `${index * n} - ${(index + 1) * n}`;
+
+const hueGroups = computed(() => [
+  'Gray',
+  ...[...Array.from({ length: 360 / groupRange.value }).keys()].map(
+    getGroupName(groupRange.value),
+  ),
+].map(Group.of));
 
 const filterOfficialIdol = (x: IGroup) => ({ ...x, idols: x.idols.filter((y) => y.isOffical) });
 const omitEmptyGroup = (x: IGroup) => arrayNotEmpty(x.idols);
-const filterOfficial = (arr: IGroup[]) => arr.map(filterOfficialIdol).filter(omitEmptyGroup);
+const filterOfficial = (array: IGroup[]) => array.map(filterOfficialIdol).filter(omitEmptyGroup);
 
 const productions = computed(() => (showUnofficial.value ? colorData : filterOfficial(colorData)));
 
-const sortedGroup = computed(() => {
-  const newGroups = productions.value.flatMap(prop('idols')).reduce((acc, cur) => {
-    const [, s, l] = cur.color.hsl();
-    if (s < 2 * grayRange.value || l < grayRange.value || l > 1 - grayRange.value) {
-      return acc.map((x, i) => (i === 0 ? x.addIdol(cur) : x));
-    }
+const sortedGroup = computed(() =>
+  // eslint-disable-next-line implicit-arrow-linebreak
+  productions.value
+    .flatMap(prop('idols'))
+    // eslint-disable-next-line unicorn/no-array-reduce
+    .reduce((accumulator, current) => {
+      const [, s, l] = current.color.hsl();
+      // add to 'Gray' group by Saturation, and Lightness
+      if (s < 2 * grayRange.value || l < grayRange.value || l > 1 - grayRange.value) {
+        return accumulator.map((x, index_) => (index_ === 0 ? x.addIdol(current) : x));
+      }
 
-    const index = Math.floor(cur.color.hsl()[0] / 30) + 1;
-    return acc.map((x, i) => (i === index ? x.addIdol(cur) : x));
-  }, hueGroups);
-
-  return newGroups.map((x: Group) => x.sort());
-});
+      // add to group by Hue
+      const index = Math.floor(current.color.hsl()[0] / groupRange.value) + 1;
+      return accumulator.map((x, index_) => (index_ === index ? x.addIdol(current) : x));
+    }, hueGroups.value)
+    .map((x: Group) => x.sort()));
 </script>
 
 <template>
