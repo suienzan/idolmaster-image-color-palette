@@ -1,3 +1,4 @@
+import { grayscale } from '@/utils';
 import Idol from './Idol';
 
 interface IEmptyGroup {
@@ -24,7 +25,9 @@ export default class Group {
   sort() {
     return {
       ...this,
-      idols: this.idols.sort((a, b) => a.color.hsl()[0] - b.color.hsl()[0]),
+      idols: this.idols.sort((a, b) => (this.name === 'Gray'
+        ? grayscale(a.color) - grayscale(b.color)
+        : a.color.hsl()[0] - b.color.hsl()[0])),
     };
   }
 
