@@ -20,18 +20,17 @@ const englishName = ref(false);
 const colorType = ref<IColorType>('hex');
 const noPrefix = ref(false);
 const groupByHue = ref(false);
-const grayRange = ref(0.15);
+const grayscaleRange = ref(0.15);
 const showUnofficial = ref(false);
+const numberOfGroups = ref(12);
 
-const groupRange = ref(30);
+const groupRange = computed(() => 360 / numberOfGroups.value);
 
-const getGroupName = (n: number) => (index: number) => `${index * n} - ${(index + 1) * n}`;
+const getGroupName = (n: number) => (index: number) => `${(index * n).toFixed(0)} - ${((index + 1) * n).toFixed(0)}`;
 
 const hueGroups = computed(() => [
   'Gray',
-  ...[...Array.from({ length: 360 / groupRange.value }).keys()].map(
-    getGroupName(groupRange.value),
-  ),
+  ...[...Array.from({ length: numberOfGroups.value }).keys()].map(getGroupName(groupRange.value)),
 ].map(Group.of));
 
 const filterOfficialIdol = (x: IGroup) => ({ ...x, idols: x.idols.filter((y) => y.isOffical) });
@@ -47,7 +46,7 @@ const sortedGroup = computed(() =>
     // eslint-disable-next-line unicorn/no-array-reduce
     .reduce((accumulator, current) => {
       // add to 'Gray' group
-      if (grayscale(current.color) < grayRange.value) {
+      if (grayscale(current.color) < grayscaleRange.value) {
         return accumulator.map((x, groupIndex) => (groupIndex === 0 ? x.addIdol(current) : x));
       }
 
@@ -112,6 +111,35 @@ const sortedGroup = computed(() =>
         v-model="showUnofficial"
         label="Show unofficial color"
       />
+    </div>
+
+    <div
+      v-if="groupByHue"
+      class="mt-2 flex flex-wrap items-center"
+    >
+      <label class="flex cursor-pointer items-center">
+        <div class="ml-1 font-medium">Grayscale Range:</div>
+        <input
+          v-model.number="grayscaleRange"
+          class="relative ml-1"
+          label="asda"
+          max="0.2"
+          min="0.1"
+          step="0.01"
+          type="range"
+        >
+      </label>
+      <label class="flex cursor-pointer items-center">
+        <div class="ml-1 font-medium">Number of groups:</div>
+        <input
+          v-model.number="numberOfGroups"
+          class="relative ml-1"
+          label="asda"
+          max="20"
+          min="6"
+          type="range"
+        >
+      </label>
     </div>
   </nav>
   <main>
