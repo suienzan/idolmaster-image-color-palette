@@ -12,6 +12,7 @@ import InputSwitch from '@/components/InputSwitch.vue';
 import InputRadio from '@/components/InputRadio.vue';
 import SimpleLink from '@/components/SimpleLink.vue';
 import IdolList from '@/components/IdolList.vue';
+import { grayscale } from './utils';
 
 const arrayNotEmpty = both(Array.isArray, compose(lt(0), length));
 
@@ -19,7 +20,7 @@ const englishName = ref(false);
 const colorType = ref<IColorType>('hex');
 const noPrefix = ref(false);
 const groupByHue = ref(false);
-const grayRange = ref(0.07);
+const grayRange = ref(0.15);
 const showUnofficial = ref(false);
 
 const groupRange = ref(30);
@@ -45,15 +46,14 @@ const sortedGroup = computed(() =>
     .flatMap(prop('idols'))
     // eslint-disable-next-line unicorn/no-array-reduce
     .reduce((accumulator, current) => {
-      const [, s, l] = current.color.hsl();
-      // add to 'Gray' group by Saturation, and Lightness
-      if (s < 2 * grayRange.value || l < grayRange.value || l > 1 - grayRange.value) {
-        return accumulator.map((x, index_) => (index_ === 0 ? x.addIdol(current) : x));
+      // add to 'Gray' group
+      if (grayscale(current.color) < grayRange.value) {
+        return accumulator.map((x, groupIndex) => (groupIndex === 0 ? x.addIdol(current) : x));
       }
 
       // add to group by Hue
       const index = Math.floor(current.color.hsl()[0] / groupRange.value) + 1;
-      return accumulator.map((x, index_) => (index_ === index ? x.addIdol(current) : x));
+      return accumulator.map((x, groupIndex) => (groupIndex === index ? x.addIdol(current) : x));
     }, hueGroups.value)
     .map((x: Group) => x.sort()));
 </script>
