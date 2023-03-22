@@ -24,7 +24,7 @@ export default class Group {
   sort() {
     return {
       ...this,
-      idols: this.idols.sort((a, b) => b.color.hsl()[2] - a.color.hsl()[2]),
+      idols: this.idols.sort((a, b) => a.color.hsl()[0] - b.color.hsl()[0]),
     };
   }
 
