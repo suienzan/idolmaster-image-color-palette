@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import {
-  both, compose, length, lt, prop,
-} from 'ramda';
+import { both, compose, length, lt, prop } from 'ramda';
 
-import { IColorType } from '@/classes/types';
+import { type ColorType } from '@/classes/types';
 import colorData from '@/colorData';
-import Group, { type IGroup } from '@/classes/Group';
+import Group, { type GroupObject } from '@/classes/Group';
 
 import InputSwitch from '@/components/InputSwitch.vue';
 import InputRadio from '@/components/InputRadio.vue';
@@ -17,7 +15,7 @@ import { grayscale } from './utils';
 const arrayNotEmpty = both(Array.isArray, compose(lt(0), length));
 
 const englishName = ref(false);
-const colorType = ref<IColorType>('hex');
+const colorType = ref<ColorType>('hex');
 const noPrefix = ref(false);
 const groupByHue = ref(false);
 const grayscaleRange = ref(0.15);
@@ -26,35 +24,37 @@ const numberOfGroups = ref(12);
 
 const groupRange = computed(() => 360 / numberOfGroups.value);
 
-const getGroupName = (n: number) => (index: number) => `${(index * n).toFixed(0)} - ${((index + 1) * n).toFixed(0)}`;
+const getGroupName = (n: number) => (index: number) =>
+  `${(index * n).toFixed(0)} - ${((index + 1) * n).toFixed(0)}`;
 
-const hueGroups = computed(() => [
-  'Gray',
-  ...[...Array.from({ length: numberOfGroups.value }).keys()].map(getGroupName(groupRange.value)),
-].map(Group.of));
+const hueGroups = computed(() =>
+  [
+    'Gray',
+    ...[...Array.from({ length: numberOfGroups.value }).keys()].map(getGroupName(groupRange.value)),
+  ].map(Group.of),
+);
 
-const filterOfficialIdol = (x: IGroup) => ({ ...x, idols: x.idols.filter((y) => y.isOffical) });
-const omitEmptyGroup = (x: IGroup) => arrayNotEmpty(x.idols);
-const filterOfficial = (array: IGroup[]) => array.map(filterOfficialIdol).filter(omitEmptyGroup);
+const filterOfficialIdol = (x: GroupObject) => ({ ...x, idols: x.idols.filter(y => y.isOffical) });
+const omitEmptyGroup = (x: GroupObject) => arrayNotEmpty(x.idols);
+const filterOfficial = (array: GroupObject[]) => array.map(filterOfficialIdol).filter(omitEmptyGroup);
 
 const productions = computed(() => (showUnofficial.value ? colorData : filterOfficial(colorData)));
 
 const sortedGroup = computed(() =>
-  // eslint-disable-next-line implicit-arrow-linebreak
   productions.value
     .flatMap(prop('idols'))
-    // eslint-disable-next-line unicorn/no-array-reduce
     .reduce((accumulator, current) => {
-      // add to 'Gray' group
+      // Add to 'Gray' group
       if (grayscale(current.color) < grayscaleRange.value) {
         return accumulator.map((x, groupIndex) => (groupIndex === 0 ? x.addIdol(current) : x));
       }
 
-      // add to group by Hue
+      // Add to group by Hue
       const index = Math.floor(current.color.hsl()[0] / groupRange.value) + 1;
       return accumulator.map((x, groupIndex) => (groupIndex === index ? x.addIdol(current) : x));
     }, hueGroups.value)
-    .map((x: Group) => x.sort()));
+    .map((x: Group) => x.sort()),
+);
 </script>
 
 <template>

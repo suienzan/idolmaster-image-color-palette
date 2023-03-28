@@ -1,11 +1,11 @@
 import untypedColorData from '@/colorData.json';
-import { IProduction } from './classes/types';
-import { IGroup } from './classes/Group';
+import { type Production } from './classes/types';
+import { type GroupObject } from './classes/Group';
 import Idol from './classes/Idol';
 
-const colorData = untypedColorData as IProduction[];
+const colorData = untypedColorData as Production[];
 
-const group: IGroup[] = colorData.map((production) => ({
+const group: GroupObject[] = colorData.map((production) => ({
   name: production.name,
   idols: production.idols
     .map((idol) => new Idol(idol))

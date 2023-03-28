@@ -1,12 +1,14 @@
-import * as chroma from 'chroma.ts';
+import type * as chroma from 'chroma.ts';
 
 export const removePrefix = (color: string) => {
   if (color.startsWith('#')) {
     return color.slice(1);
   }
+
   if (color.startsWith('hsl(') || color.startsWith('rgb(')) {
     return color.slice(4, -1);
   }
+
   return color;
 };
 

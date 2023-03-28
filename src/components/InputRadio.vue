@@ -1,22 +1,20 @@
 <script setup lang="ts" name="InputRadio">
 import { computed, toRefs } from 'vue';
 
-interface Properties {
+type Properties = {
   modelValue: string;
   value: string;
   name: string;
   label?: string;
-}
+};
 
 const properties = withDefaults(defineProps<Properties>(), {
   label: '',
 });
 
-const {
-  modelValue, value, name, label,
-} = toRefs(properties);
+const { modelValue, value, name, label } = toRefs(properties);
 
-const emit = defineEmits<{(event: 'update:modelValue', payload: string): void }>();
+const emit = defineEmits<(event: 'update:modelValue', payload: string) => void>();
 
 const checked = computed(() => modelValue.value === value.value);
 </script>

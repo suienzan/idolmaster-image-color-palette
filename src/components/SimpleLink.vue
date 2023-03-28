@@ -1,15 +1,13 @@
 <script setup lang="ts" name="SimpleLink">
 import { toRefs } from 'vue';
 
-interface Properties {
+type Properties = {
   href: string;
-}
+};
 
 const properties = defineProps<Properties>();
 
-const {
-  href,
-} = toRefs(properties);
+const { href } = toRefs(properties);
 </script>
 
 <template>

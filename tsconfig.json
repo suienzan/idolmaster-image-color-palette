@@ -20,5 +20,5 @@
     "types": ["node", "vitest/importMeta"],
     "skipLibCheck": true
   },
-  "include": ["vite.config.*", "src/**/*", "src/**/*.vue", "test/**/*.ts"]
+  "include": ["vite.config.*", "src/**/*", "src/**/*.vue", "test/**/*.ts", ".eslintrc.cjs"]
 }

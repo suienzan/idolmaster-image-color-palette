@@ -1,20 +1,18 @@
 <script setup lang="ts" name="InputSwitch">
 import { toRefs } from 'vue';
 
-interface Properties {
+type Properties = {
   modelValue: boolean;
   label?: string;
-}
+};
 
 const properties = withDefaults(defineProps<Properties>(), {
   label: '',
 });
 
-const {
-  modelValue, label,
-} = toRefs(properties);
+const { modelValue, label } = toRefs(properties);
 
-const emit = defineEmits<{(event: 'update:modelValue', payload: boolean): void }>();
+const emit = defineEmits<(event: 'update:modelValue', payload: boolean) => void>();
 </script>
 
 <template>

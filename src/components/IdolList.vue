@@ -1,16 +1,16 @@
 <script setup lang="ts" name="IdolList">
 import * as chroma from 'chroma.ts';
-import Idol from '@/classes/Idol';
-import { IColorType } from '@/classes/types';
+import type Idol from '@/classes/Idol';
+import { type ColorType } from '@/classes/types';
 import { removePrefix } from '@/utils';
 import { toRefs } from 'vue';
 
-interface Properties {
+type Properties = {
   idols: Idol[];
   englishName: boolean;
-  colorType: IColorType;
+  colorType: ColorType;
   noPrefix: boolean;
-}
+};
 
 const properties = withDefaults(defineProps<Properties>(), {
   idols: () => [],
@@ -19,12 +19,7 @@ const properties = withDefaults(defineProps<Properties>(), {
   noPrefix: false,
 });
 
-const {
-  idols,
-  englishName,
-  colorType,
-  noPrefix,
-} = toRefs(properties);
+const { idols, englishName, colorType, noPrefix } = toRefs(properties);
 
 const isDarkColor = (hex: string) => chroma.color(hex).hsl()[2] < 0.5;
 
@@ -33,9 +28,7 @@ const getColor = (idol: Idol) => {
   return noPrefix.value ? removePrefix(color) : color;
 };
 
-const copyToClipboard = (idol: Idol) => {
-  navigator.clipboard.writeText(getColor(idol));
-};
+const copyToClipboard = async (idol: Idol) => navigator.clipboard.writeText(getColor(idol));
 </script>
 
 <template>

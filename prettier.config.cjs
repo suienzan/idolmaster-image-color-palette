@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
 const tailwindcss = require('prettier-plugin-tailwindcss');
 
 module.exports = {

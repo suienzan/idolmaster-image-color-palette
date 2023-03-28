@@ -1,33 +1,34 @@
 import { grayscale } from '@/utils';
-import Idol from './Idol';
+import type Idol from './Idol';
 
-interface IEmptyGroup {
+type EmptyGroup = {
   name: string;
   idols?: Idol[];
-}
+};
 
-export type IGroup = Required<IEmptyGroup>;
+export type GroupObject = Required<EmptyGroup>;
 
 export default class Group {
-  constructor({ name, idols }: IEmptyGroup) {
-    this.name = name;
-    this.idols = idols || [];
+  static of(x: string | GroupObject): Group {
+    return typeof x === 'string' ? new Group({ name: x }) : new Group(x);
   }
 
   name: string;
-
   idols: Idol[];
 
-  static of(g: string | IGroup): Group {
-    return typeof g === 'string' ? new Group({ name: g }) : new Group(g);
+  constructor({ name, idols }: EmptyGroup) {
+    this.name = name;
+    this.idols = idols ?? [];
   }
 
   sort() {
     return {
       ...this,
-      idols: this.idols.sort((a, b) => (this.name === 'Gray'
-        ? grayscale(a.color) - grayscale(b.color)
-        : a.color.hsl()[0] - b.color.hsl()[0])),
+      idols: this.idols.sort((a, b) =>
+        this.name === 'Gray'
+          ? grayscale(a.color) - grayscale(b.color)
+          : a.color.hsl()[0] - b.color.hsl()[0],
+      ),
     };
   }
 

@@ -1,13 +1,13 @@
-export type IColorType = 'rgb' | 'hsl' | 'hex';
+export type ColorType = 'rgb' | 'hsl' | 'hex';
 
-export interface IIdol {
+export type IdolObject = {
   ja: string;
   en?: string;
   hex: `#${string}`;
   isOffical?: boolean;
-}
+};
 
-export interface IProduction {
+export type Production = {
   name: string;
-  idols: IIdol[];
-}
+  idols: IdolObject[];
+};
