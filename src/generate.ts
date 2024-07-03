@@ -56,7 +56,7 @@ const cinderellaGirlsOfficiallList = new Set([
 ]);
 
 const checkOfficial = (production: string, idolName: string) =>
-  production !== 'CinderellaGirls' || cinderellaGirlsOfficiallList.has(idolName);
+  !['CinderellaGirls', 'Gakuen'].includes(production) || cinderellaGirlsOfficiallList.has(idolName);
 
 const patchOfficial = (production: string) => (idol: IdolObject) => ({
   ...idol,
@@ -83,7 +83,15 @@ const readFile = async (production: string): Promise<{ name: string; idols: Elem
       idols: convertToJs(data),
     }));
 
-const productions = ['1stVision', '765MillionStars', 'CinderellaGirls', '283', '876', '961'];
+const productions = [
+  '1stVision',
+  '765MillionStars',
+  'CinderellaGirls',
+  '283',
+  '876',
+  '961',
+  'Gakuen',
+];
 
 const data = await Promise.all(productions.map(readFile));
 
